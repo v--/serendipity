@@ -1,0 +1,80 @@
+This is a PlantUML file (http://plantuml.com/).
+
+@startuml
+
+skinparam monochrome true
+
+:Read ALSA buffer;
+
+note right
+    An ALSA steam is written to a buffer
+    and flushed it every N milliseconds.
+end note
+
+partition "Feature vector extraction" {
+    fork
+        partition "Prosodic features" {
+            partition "Signal enhancing" {
+                :Filtering;
+                :Framing;
+                :Windowing;
+            }
+
+            fork
+                :Zero crossing time;
+            fork again
+                :Short time energy;
+            fork again
+                :Pitch;
+            end fork
+        }
+
+    fork again
+
+        partition "Spectral features" {
+            :LPCC;
+
+            note right
+                Linear prediction
+                cepstral coefficients.
+            end note
+
+            :Dimension reduction;
+
+            note right
+                7 should be enough,
+                but because of recursive algorithms,
+                reduction should be done after computing.
+            end note
+        }
+
+    end fork
+}
+
+partition "Neural network" {
+    :Prediction;
+
+    note right
+        This is an R^10 -> N^3 x R^2 image.
+        N^3 are 3-chords in the chord progression.
+        R^2 are the volume and the tempo.
+    end note
+}
+
+partition "Music composition" {
+    fork
+        :Chord progression;
+    fork again
+        :Volume;
+    fork again
+        :Tempo;
+    end fork
+}
+
+:Playback;
+
+note right
+    Using a CC-licensed music font.
+end note
+
+@enduml
