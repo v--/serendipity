@@ -1,0 +1,9 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"alsa-lib": "1.0.1+1.0.27.2",
+		"subscribed": "1.6.1",
+		"experimental_allocator": "2.70.0-b1",
+		"colored-logger": "0.1.0"
+	}
+}
