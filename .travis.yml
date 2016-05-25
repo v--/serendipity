@@ -1,0 +1,20 @@
+language: d
+
+d:
+  - dmd
+  - ldc
+
+install:
+  - dub fetch doveralls
+
+script:
+  - dub test -b unittest-cov
+  - dub run doveralls
+
+test:
+  dub test
+
+addons:
+  apt:
+    packages:
+    - libasound2-dev
