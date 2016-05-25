@@ -10,6 +10,7 @@ struct SerendipitySettings
         getopt(args,
             config.required, "device", &result.device,
             config.required, "rate", &result.rate,
+            "depth", &result.depth,
         );
 
         return result;
@@ -17,4 +18,5 @@ struct SerendipitySettings
 
     string device;
     uint rate;
+    uint depth = 16;
 }

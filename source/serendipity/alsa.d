@@ -6,53 +6,62 @@ import deimos.alsa.pcm;
 /// Missing binding from the deimos port
 extern (C) char* snd_strerror(int code);
 
-/// Only little endian
-struct Sample
+struct ALSAReader(byte depth)
 {
-    private ubyte[3] payload;
-
-    enum max = int.max >> 8;
-    enum min = int.min >> 8;
-
-    this(ubyte a, ubyte b, ubyte c)
+    static if (depth == 16)
+        alias Sample = short;
+    else static if (depth == 24)
     {
-        payload = [a, b, c];
+        /// Only little endian
+        struct Sample
+        {
+            private ubyte[3] payload;
+
+            enum max = int.max >> 8;
+            enum min = int.min >> 8;
+
+            this(ubyte a, ubyte b, ubyte c)
+            {
+                payload = [a, b, c];
+            }
+
+            int toInt()
+            {
+                int result;
+
+                result <<= 8;
+                result |= payload[2];
+                result &= 0b0111_1111;
+
+                result <<= 8;
+                result |= payload[1];
+
+                result <<= 8;
+                result |= payload[0];
+
+                if (payload[2] & 0b1000_0000)
+                    result *= -1;
+
+                return result;
+            }
+
+            alias toInt this;
+        }
+
+        unittest
+        {
+            assert(Sample(0, 0, 0) == 0);
+            assert(Sample(0, 0, 0b1000_0000).toInt == 0);
+            assert(Sample(0xFF, 0, 0).toInt == 255);
+            assert(Sample(0, 0xFF, 0).toInt == 255 << 8);
+            assert(Sample(0, 0, 0xFF).toInt == -0b0111_1111 << 16);
+        }
+    }
+    else
+    {
+        static assert(false, "The depth " ~ depth ~ " is not currently supported.");
     }
 
-    int toInt()
-    {
-        int result;
-
-        result <<= 8;
-        result |= payload[2];
-        result &= 0b0111_1111;
-
-        result <<= 8;
-        result |= payload[1];
-
-        result <<= 8;
-        result |= payload[0];
-
-        if (payload[2] & 0b1000_0000)
-            result *= -1;
-
-        return result;
-    }
-
-    alias toInt this;
-}
-
-unittest
-{
-    assert(Sample(0, 0, 0) == 0);
-    assert(Sample(0, 0, 0b1000_0000).toInt == 0);
-    assert(Sample(0xFF, 0, 0).toInt == 255);
-    assert(Sample(0, 0xFF, 0).toInt == 255 << 8);
-    assert(Sample(0, 0, 0xFF).toInt == -0b0111_1111 << 16);
-}
-
-struct ALSAReader
-{
     @disable this();
 
     private
@@ -157,7 +166,7 @@ struct ALSAReader
         Result result;
 
         result.read = enforceALSA(
-            cast(int)snd_pcm_readi(handle, cast(void*)result.buffer.ptr, maxReadCount - size_t.sizeof / byte.sizeof),
+            cast(int)snd_pcm_readi(handle, cast(void*)result.buffer.ptr, maxReadCount - 8),
             "Error reading the stream"
         );
 
