@@ -68,14 +68,14 @@ partition "Music composition" {
 
         note right
             Proportional to
-            emotion valence.
+            the emotion arousal.
         end note
     fork again
         :Scale;
 
         note right
             As a classification
-            of the emotion arousal.
+            of the emotion valence.
         end note
     end fork
 }
