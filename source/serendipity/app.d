@@ -1,33 +1,46 @@
 module serendipity.app;
 
+import core.memory : GC;
 import std.typecons : scoped;
 import std.conv : to;
 
 import serendipity.logger;
-import serendipity.alsa;
 import serendipity.settings;
+import serendipity.reader.factory;
 import subscribed;
 
-void main(string[] args)
-{
-    auto settings = SerendipitySettings.fromArgs(args);
-    auto logger = scoped!SerendipityLogger();
+enum chunkSize = 128;
 
-    switch (settings.depth)
+int main(string[] args)
+{
+    auto logger = scoped!SerendipityLogger();
+    SerendipitySettings settings;
+
+    try
+        settings = SerendipitySettings.fromArgs(args);
+    catch (ArgParseError e)
     {
-    case 16: startLoop!16(settings, logger); break;
-    case 24: startLoop!24(settings, logger); break;
-    default: assert(false, "The depth " ~ to!string(settings.depth) ~ " is not currently supported.");
+        SerendipitySettings.printHelp();
+        return 1;
     }
+    catch (ArgParseHelp e)
+    {
+        SerendipitySettings.printHelp();
+        return 0;
+    }
+
+    GC.collect();
+    startEventLoop(&settings, logger);
+    return 0;
 }
 
-void startLoop(uint depth)(SerendipitySettings settings, SerendipityLogger logger)
+void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
 {
-    auto reader = ALSAReader!depth(settings.device, settings.rate);
-    logger.info("Initialized everything.");
+    auto reader = constructReader(settings, logger);
 
-    foreach (sample; reader.read())
-    {
-        import std.stdio: write; write(sample + 0);
-    }
+    while (reader.readable)
+        foreach (sample; reader.read(chunkSize))
+        {
+            import std.stdio: write; write(sample);
+        }
 }

@@ -1,22 +1,39 @@
 module serendipity.settings;
 
+import std.stdio;
+import darg;
+public import darg : ArgParseError, ArgParseHelp;
+
 struct SerendipitySettings
 {
     static fromArgs(string[] args)
     {
-        import std.getopt : getopt, config;
-        SerendipitySettings result;
-
-        getopt(args,
-            config.required, "device", &result.device,
-            config.required, "rate", &result.rate,
-            "depth", &result.depth,
-        );
-
-        return result;
+        return parseArgs!SerendipitySettings(args[1..$]);
     }
 
-    string device;
-    uint rate;
-    uint depth = 16;
+    static void printHelp()
+    {
+        writeln(usageString!SerendipitySettings("serendipity"));
+        writeln(helpString!SerendipitySettings);
+    }
+
+    @Option("help", "h")
+    @Help("Prints this help.")
+    OptionFlag help;
+
+    @Option("depth")
+    @Help("[ALSA only] The bit depth of each sample. 8, 16 and 24-bit samples are supported. Default is 16.")
+    ubyte depth = 16;
+
+    @Option("rate")
+    @Help("[ALSA only] The required sampling rate. Default is 44100Hz (CD quality).")
+    uint rate = 44_100;
+
+    @Option("reader")
+    @Help("Either \"wav\" or \"alsa\". Default is \"alsa\".")
+    string reader = "alsa";
+
+    @Argument("source")
+    @Help("The source file or ALSA device to read from.")
+    string source;
 }
