@@ -26,8 +26,8 @@ class ALSAReader: IReader
 
     this(SerendipitySettings* settings, SerendipityLogger logger)
     {
-        device = ALSADevice(settings.source, settings.depth, settings.rate);
-        logger.infof("Successfully prepared device '%s' for use", settings.source);
+        device = ALSADevice(settings.source, false, settings.depth, settings.rate);
+        logger.infof("Successfully prepared device '%s' for use", device.name);
     }
 
     override
@@ -50,7 +50,7 @@ class ALSAReader: IReader
             }
         }
 
-        IReaderResult read(size_t amount)
+        ReaderResult read(size_t amount)
         {
             return device.read(amount);
         }

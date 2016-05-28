@@ -5,17 +5,18 @@ import serendipity.settings;
 import serendipity.reader.iface;
 import serendipity.reader.result;
 import serendipity.support.wav;
+import serendipity.support.upsample;
 
 class WAVReader: IReader
 {
-    WAVFile!(byte[]) file;
+    WAVFile!(ubyte[]) file;
     size_t pos;
 
     this(SerendipitySettings* settings, SerendipityLogger logger)
     {
         import std.file : read;
-        auto raw = cast(byte[])read(settings.source);
-        file = WAVFile!(byte[])(raw);
+        auto raw = cast(ubyte[])read(settings.source);
+        file = WAVFile!(ubyte[])(raw);
         logger.infof("Read a WAV file with bit depth %d and sample rate %d.", file.bitDepth, file.sampleRate);
     }
 
@@ -39,13 +40,18 @@ class WAVReader: IReader
             }
         }
 
-        IReaderResult read(size_t amount)
+        ReaderResult read(size_t amount)
         {
             import std.algorithm : min;
-            auto result = constructResult(depth);
-            result.capacity = amount;
-            result.size = min(amount, file.size - pos);
-            result.setDataPtr(cast(void*)file.data[pos..pos + amount].ptr, depth);
+            import std.range : drop, take, chunks;
+            auto result = ReaderResult(depth, amount);
+            size_t i;
+
+            foreach (sample; file.data.chunks(depth / 8).drop(pos).take(amount))
+                result.payload[i++] = upsample(sample);
+
+            result.size = i;
+            pos += i;
             return result;
         }
     }

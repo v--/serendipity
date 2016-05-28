@@ -4,7 +4,7 @@ import std.traits : Unqual;
 import std.conv : to;
 import std.range;
 
-struct WAVFile(R) if (isInputRange!(Unqual!R) && is(ElementType!R == byte))
+struct WAVFile(R) if (isInputRange!(Unqual!R) && is(ElementType!R == ubyte))
 {
     const
     {

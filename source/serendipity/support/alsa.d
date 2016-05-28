@@ -25,8 +25,10 @@ private
 struct ALSADevice
 {
     snd_pcm_t* handle;
+    string _name;
     ubyte _depth;
     uint _rate;
+    bool _writable;
 
     @property @safe @nogc const
     {
@@ -39,17 +41,26 @@ struct ALSADevice
         {
             return _rate;
         }
+
+        string name()
+        {
+            return _name;
+        }
     }
 
-    this(string name, ubyte depth, uint rate)
+    this(string name, bool write, ubyte depth, uint rate)
     {
+        import std.string : toStringz;
+
         snd_pcm_hw_params_t* hwparams;
+        _name = name;
         _depth = depth;
         _rate = rate;
-        auto format = snd_pcm_build_linear_format(depth, depth, false, false);
+        _writable = write;
+        auto format = snd_pcm_build_linear_format(depth, 32, false, false);
 
         enforceALSA(
-            snd_pcm_open(&handle, "default", snd_pcm_stream_t.PLAYBACK, 0),
+            snd_pcm_open(&handle, name.toStringz, write ? snd_pcm_stream_t.PLAYBACK : snd_pcm_stream_t.CAPTURE, 0),
             "Could not open '" ~ name ~ "'"
         );
 
@@ -89,35 +100,54 @@ struct ALSADevice
         );
 
         snd_pcm_hw_params_free(hwparams);
+    }
+
+    ~this()
+    {
+        snd_pcm_close(handle);
+    }
+
+    ReaderResult read(size_t amount)
+    in
+    {
+        assert(!_writable);
+    }
+    body
+    {
+        auto result = ReaderResult(depth, amount);
 
         enforceALSA(
             snd_pcm_prepare(handle),
             "Could not prepare '" ~ name ~"' for use"
         );
-    }
-
-    ~this()
-    {
-        snd_pcm_drain(handle);
-    }
-
-    IReaderResult read(size_t amount)
-    {
-        auto result = constructResult(depth);
-        result.allocate(amount);
 
         result.size = enforceALSA(
-            cast(int)snd_pcm_readi(handle, result.dataPtr, amount),
+            cast(int)snd_pcm_readi(handle, cast(void*)result.payload.ptr, amount),
             "Error reading the stream"
+        );
+
+        enforceALSA(
+            snd_pcm_drain(handle),
+            "Could not wait for the handle to drain"
         );
 
         return result;
     }
 
     void play(R)(R stream) if (isInputRange!(Unqual!R))
+    in
+    {
+        assert(_writable);
+    }
+    body
     {
         import std.array : array;
         auto data = stream.array;
+
+        enforceALSA(
+            snd_pcm_prepare(handle),
+            "Could not prepare '" ~ name ~"' for use"
+        );
 
         enforceALSA(
             cast(int)snd_pcm_writei(handle, data.ptr, data.length),

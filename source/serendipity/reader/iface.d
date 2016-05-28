@@ -1,22 +1,6 @@
 module serendipity.reader.iface;
 
-interface IReaderResult
-{
-    @property @safe @nogc const
-    {
-        int front();
-        size_t size();
-        size_t capacity();
-    }
-        bool empty();
-
-    void allocate(size_t capacity);
-    void popFront() @safe ;
-    void size(size_t size) @property @safe @nogc;
-    void capacity(size_t capacity) @property @safe @nogc;
-    void* dataPtr() @property @nogc const;
-    void setDataPtr(void* value, ubyte depth);
-}
+import serendipity.reader.result;
 
 interface IReader
 {
@@ -27,5 +11,5 @@ interface IReader
         uint rate();
     }
 
-    IReaderResult read(size_t amount);
+    ReaderResult read(size_t amount);
 }
