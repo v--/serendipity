@@ -1,4 +1,4 @@
-module serendipity.noise;
+module serendipity.synth.noise;
 
 double generateCauchyDistRandom(double median, double variance)
 {
