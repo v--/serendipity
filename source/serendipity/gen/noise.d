@@ -40,9 +40,3 @@ double[] generatePinkNoise(uint n)
     auto pinkNoiseRms = pinkNoiseNormalized.fold!((a, b) => a + b ^^ 2).sqrt();
     return pinkNoiseNormalized.map!((a) => a / pinkNoiseRms).array();
 }
-
-unittest
-{
-    import std.stdio;
-    writeln(generatePinkNoise(16));
-}
