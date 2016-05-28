@@ -44,5 +44,5 @@ double[] generatePinkNoise(uint n)
 unittest
 {
     import std.stdio;
-    writeln(generatePinkNoise(10));
+    writeln(generatePinkNoise(16));
 }
