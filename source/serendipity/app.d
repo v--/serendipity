@@ -7,9 +7,10 @@ import std.conv : to;
 import serendipity.logger;
 import serendipity.settings;
 import serendipity.reader.factory;
+import serendipity.support.alsa;
 import subscribed;
 
-enum chunkSize = 128;
+enum chunkSize = 3 * 16_000;
 
 int main(string[] args)
 {
@@ -37,10 +38,17 @@ int main(string[] args)
 void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
 {
     auto reader = constructReader(settings, logger);
+    auto writer = ALSADevice("pulse", 32, 16_000);
 
-    while (reader.readable)
-        foreach (sample; reader.read(chunkSize))
-        {
-            import std.stdio: write; write(sample);
-        }
+    //while (reader.readable)
+    {
+        auto result = reader.read(chunkSize);
+        import std.stdio: writeln; writeln(result.empty);
+        //writer.play(result);
+
+        //foreach (sample; reader.read(chunkSize))
+        //{
+        //    writeln(sample);
+        //}
+    }
 }

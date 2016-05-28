@@ -22,7 +22,7 @@ struct SerendipitySettings
     OptionFlag help;
 
     @Option("depth")
-    @Help("[ALSA only] The bit depth of each sample. 8, 16 and 24-bit samples are supported. Default is 16.")
+    @Help("[ALSA only] The bit depth of each sample. 16 and 24-bit samples are supported. Default is 16.")
     ubyte depth = 16;
 
     @Option("rate")

@@ -7,13 +7,32 @@ import serendipity.reader.iface;
 
 class ReaderResult(ubyte depth): IReaderResult
 {
-    static if (depth == 8)
-        alias Sample = byte;
-    else static if (depth == 16)
-        alias Sample = short;
+    /// Only works on little endian architectures at the moment
+    static if (depth == 16)
+        struct Sample
+        {
+            private short payload;
+
+            this(ubyte a, ubyte b)
+            {
+                int result;
+
+                result <<= 16;
+                result |= payload;
+                result &= 0b0111_1111_1111_1111;
+
+                if (payload & 0b1000_0000_0000_0000)
+                    result *= -1;
+            }
+
+            int toInt() const
+            {
+                return cast(int)(payload);
+            }
+
+            alias toInt this;
+        }
     else static if (depth == 24)
-    {
-        /// Only works on little endian architectures at the moment
         struct Sample
         {
             private ubyte[3] payload;
@@ -43,28 +62,27 @@ class ReaderResult(ubyte depth): IReaderResult
                 if (payload[2] & 0b1000_0000)
                     result *= -1;
 
-                return result;
+                return result * byte.max;
             }
 
             alias toInt this;
         }
-    }
-    else
-        static assert(false, "The depth " ~ to!string(depth) ~ " is not currently supported.");
+        else
+            static assert(false, "The depth " ~ to!string(depth) ~ " is not currently supported.");
 
     private
     {
         size_t pos;
         size_t _size;
-        size_t capacity;
+        size_t _capacity;
+        Sample[] payload;
     }
 
-    package Sample[] payload;
-
-    this(size_t capacity)
+    void allocate(size_t capacity)
     {
-        this.capacity = capacity;
+        assert(this.capacity == 0, "The range is already allocated.");
         payload = theAllocator.makeArray!Sample(capacity);
+        _capacity = capacity;
     }
 
     ~this()
@@ -74,11 +92,6 @@ class ReaderResult(ubyte depth): IReaderResult
 
     override
     {
-        size_t size() @safe @nogc const
-        {
-            return _size;
-        }
-
         void size(size_t size) @property @safe @nogc
         in
         {
@@ -89,18 +102,39 @@ class ReaderResult(ubyte depth): IReaderResult
             _size = size;
         }
 
+        size_t size() @safe @nogc const
+        {
+            return _size;
+        }
+
+        void capacity(size_t capacity) @property @safe @nogc
+        {
+            _capacity = capacity;
+        }
+
+        size_t capacity() const @property @safe @nogc
+        {
+            return _capacity;
+        }
+
         void* dataPtr() @property @nogc const
         {
             return cast(void*)payload.ptr;
         }
 
-        bool empty() @property @safe @nogc const
+        void setDataPtr(void* ptr, ubyte depth)
+        {
+            payload = cast(Sample[])ptr[0.._size * depth];
+        }
+
+        bool empty() @property @safe const
         {
             return pos == _size;
         }
 
-        int front() @property @safe @nogc const
+        int front() @property @safe const
         {
+            assert(this.capacity != 0, "The range is empty.");
             return payload[pos];
         }
 
@@ -109,17 +143,15 @@ class ReaderResult(ubyte depth): IReaderResult
             assert(pos < capacity, "Cannot pop an empty range.");
             pos++;
         }
-
     }
 }
 
-IReaderResult constructResult(ubyte depth, size_t capacity)
+IReaderResult constructResult(ubyte depth)
 {
     switch (depth)
     {
-    case 8: return theAllocator.make!(ReaderResult!8)(capacity);
-    case 16: return theAllocator.make!(ReaderResult!16)(capacity);
-    case 24: return theAllocator.make!(ReaderResult!24)(capacity);
+    case 16: return theAllocator.make!(ReaderResult!16);
+    case 24: return theAllocator.make!(ReaderResult!24);
     default: assert(false, "The depth " ~ to!string(depth) ~ " is not currently supported.");
     }
 }
