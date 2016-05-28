@@ -3,8 +3,8 @@ module serendipity.synth.noise;
 double generateCauchyDistRandom(double median, double variance)
 {
     import std.math : tan, PI;
-    import std.random : uniform;
-    return median + variance * tan(PI * (uniform(0, 1) - 0.5));
+    import std.random : uniform01;
+    return median + variance * tan(PI * (uniform01() - 0.5));
 }
 
 double generateCauchyDistRandom()
