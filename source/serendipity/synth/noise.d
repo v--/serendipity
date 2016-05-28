@@ -34,7 +34,7 @@ double[] generatePinkNoise(uint n)
     }
 
     auto pinkNoise = whiteNoise.inverseFft().map!((a) => a.re);
-    auto mean = pinkNoise.fold!((a, b) => a + b);
+    auto mean = pinkNoise.fold!((a, b) => a + b) / n;
     auto pinkNoiseNormalized = pinkNoise.map!((a) => a - mean);
     auto pinkNoiseRms = pinkNoiseNormalized.fold!((a, b) => a + b ^^ 2).sqrt();
     return pinkNoiseNormalized.map!((a) => a / pinkNoiseRms).array();
