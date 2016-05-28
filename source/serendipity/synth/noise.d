@@ -20,18 +20,17 @@ double[] generatePinkNoise(uint n)
     import std.numeric : inverseFft, fft;
     import std.range : iota, generate, take;
 
-    auto m = n % 2 ? n + 1 : n;
-    auto whiteNoise = generate!(generateCauchyDistRandom).take(m).array().fft();
-    auto numberOfUniquePoints = m / 2 + 1;
-    auto inverseVector = iota(1, numberOfUniquePoints + 1).map!((a) => sqrt(cast(double)a));
+    auto whiteNoise = generate!(generateCauchyDistRandom).take(n).array().fft();
+    auto numberOfUniquePoints = n / 2;
+    auto inverseVector = iota(1, numberOfUniquePoints + 1).array().map!((a) => sqrt(cast(double)a));
 
-    for (auto i = 1; i <= numberOfUniquePoints; i++)
+    for (auto i = 0; i < numberOfUniquePoints; i++)
         whiteNoise[i] /= inverseVector[i];
 
-    for (auto i = numberOfUniquePoints + 1, j = m / 2; i <= m && j >= 2; i++, j--)
+    for (auto i = numberOfUniquePoints; i < n; i++)
     {
-        whiteNoise[i].re = whiteNoise[j].re;
-        whiteNoise[i].im = -whiteNoise[j].im;
+        whiteNoise[i].re = whiteNoise[n - 1 - i].re;
+        whiteNoise[i].im = -whiteNoise[n - 1 - i].im;
     }
 
     auto pinkNoise = whiteNoise.inverseFft().map!((a) => a.re);
