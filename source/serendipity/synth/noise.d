@@ -40,8 +40,11 @@ double[] generatePinkNoise(uint n)
     return pinkNoiseNormalized.map!((a) => a / pinkNoiseRms).array();
 }
 
+/*
 unittest
 {
     import std.stdio;
-    writeln(generatePinkNoise(16));
+    import std.algorithm : map;
+    writeln(generatePinkNoise(16).map!(a => cast(int)(64 + a * 64)));
 }
+*/
