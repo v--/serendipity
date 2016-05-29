@@ -44,7 +44,7 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
     auto writer = ALSADevice("pulse", true, 32, 16_000);
     auto regressor = Regressor(settings.regressor);
     auto synth = new FluidSynth(settings.soundfont);
-    auto noiseChunkSize = settings.entropyRate * chunkSize;
+    auto noiseChunkSize = cast(size_t)(settings.entropyRate * chunkSize);
 
     while (reader.readable)
     {
