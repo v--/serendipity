@@ -16,6 +16,7 @@ alias fluid_event_callback_t = void function(uint time, fluid_event_t* event, fl
     extern (C) fluid_settings_t* new_fluid_settings();
     extern (C) fluid_synth_t* new_fluid_synth(fluid_settings_t* settings);
     extern (C) fluid_audio_driver_t* new_fluid_audio_driver(fluid_settings_t* settings, fluid_synth_t* synth);
+    extern (C) int fluid_settings_setstr(fluid_settings_t* settings, const char* name, const char* str);
     extern (C) fluid_sequencer_t* new_fluid_sequencer2(int use_system_timer);
     extern (C) short fluid_sequencer_register_fluidsynth(fluid_sequencer_t* sequencer, fluid_synth_t* synth);
     extern (C) short fluid_sequencer_register_client(fluid_sequencer_t* sequencer, const char* name, fluid_event_callback_t callback, void* data);
