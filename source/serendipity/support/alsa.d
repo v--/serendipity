@@ -121,7 +121,7 @@ struct ALSADevice
             "Could not prepare '" ~ name ~"' for use"
         );
 
-        result.size = enforceALSA(
+        result.length = enforceALSA(
             cast(int)snd_pcm_readi(handle, cast(void*)result.payload.ptr, amount),
             "Error reading the stream"
         );

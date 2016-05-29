@@ -50,7 +50,7 @@ class WAVReader: IReader
             foreach (sample; file.data.chunks(depth / 8).drop(pos).take(amount))
                 result.payload[i++] = upsample(sample);
 
-            result.size = i;
+            result.length = i;
             pos += i;
             return result;
         }

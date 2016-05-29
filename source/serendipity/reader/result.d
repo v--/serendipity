@@ -13,7 +13,7 @@ struct ReaderResult
     }
 
     int[] payload;
-    size_t size;
+    size_t length;
 
     this(ubyte depth, size_t capacity)
     in
@@ -35,18 +35,23 @@ struct ReaderResult
 
     bool empty() @property @safe const
     {
-        return pos == size;
+        return pos == length;
     }
 
     int front() @property @safe const
     {
-        assert(this.size != 0, "The range is empty.");
+        assert(this.length != 0, "The range is empty.");
         return payload[pos];
     }
 
     void popFront() @safe @nogc
     {
-        assert(pos < size, "Cannot pop an empty range.");
+        assert(pos < length, "Cannot pop an empty range.");
         pos++;
+    }
+
+    ReaderResult save() @safe @nogc
+    {
+        return this;
     }
 }

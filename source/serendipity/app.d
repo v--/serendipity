@@ -4,13 +4,13 @@ import core.memory : GC;
 import std.typecons : scoped;
 import std.conv : to;
 
+import serendipity.constants;
 import serendipity.logger;
 import serendipity.settings;
 import serendipity.reader.factory;
 import serendipity.support.alsa;
 import serendipity.reader.result;
-
-enum chunkSize = 16_000;
+import serendipity.reducers.lpcc;
 
 int main(string[] args)
 {
@@ -40,8 +40,9 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
     auto reader = constructReader(settings, logger);
     auto writer = ALSADevice("pulse", true, 32, 16_000);
 
-    while (reader.readable)
+    //while (reader.readable)
     {
-        writer.play(reader.read(chunkSize));
+        auto result = reader.read(chunkSize);
+        auto lpcc = lpccReducer(result.save);
     }
 }
