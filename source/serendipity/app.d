@@ -43,6 +43,8 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
     auto reader = constructReader(settings, logger);
     auto writer = ALSADevice("pulse", true, 32, 16_000);
     auto regressor = Regressor(settings.regressor);
+    auto synth = new FluidSynth(settings.soundfont);
+    auto noiseChunkSize = settings.entropyRate * chunkSize;
 
     while (reader.readable)
     {
@@ -50,6 +52,10 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
         immutable averageAmplitude = result.map!(a => a / result.length).sum();
         immutable lpcc = lpccReducer(result.save);
         immutable predicted = regressor.predict(lpcc);
+        synth.volume = averageAmplitude;
+        synth.tempo = predicted.tempo;
+        synth.scale = predicted.scale;
+        synth.play(noiseChunkSize, settings.channel);
         import std.stdio: writeln; writeln(predicted);
     }
 }
