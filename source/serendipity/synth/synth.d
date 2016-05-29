@@ -4,40 +4,81 @@ import serendipity.synth.iface;
 
 abstract class Synth: ISynth
 {
-    @nogc @safe
+    private
     {
-        private
-        {
-            uint m_durationScale, m_offset, m_spacing, m_tempo, m_volume;
-            Scale m_scale;
-        }
+        uint m_durationScale, m_offset, m_spacing, m_tempo;
+        short m_volume;
+        Scale m_scale;
+    }
 
-        protected void sendNote(int channel, short key, short velocity, uint duration, uint date);
-
-        this(uint durationScale = 10, uint offset = 0, uint spacing = 0, uint tempo = 1, uint volume = 1, Scale scale = Scale.NATURAL)
-        {
-            m_durationScale = durationScale;
-            m_offset = offset;
-            m_spacing = spacing;
-            m_tempo = tempo;
-            m_volume = volume;
-            m_scale = scale;
-        }
+    this(uint durationScale = 10, uint offset = 0, uint spacing = 0, uint tempo = 1, short volume = 1, Scale scale = Scale.NATURAL)
+    {
+        m_durationScale = durationScale;
+        m_offset = offset;
+        m_spacing = spacing;
+        m_tempo = tempo;
+        m_volume = volume;
+        m_scale = scale;
     }
 
     @property
     {
-        Scale scale()
+        override uint durationScale()
+        {
+            return m_durationScale;
+        }
+
+        override uint offset()
+        {
+            return m_offset;
+        }
+
+        override uint spacing()
+        {
+            return m_spacing;
+        }
+
+        override uint tempo()
+        {
+            return m_tempo;
+        }
+
+        override uint tempo(uint value)
+        {
+            return m_tempo = value;
+        }
+
+        override uint tempo(double valence)
+        {
+            return m_tempo = cast(uint)(m_durationScale * (1 - valence));
+        }
+
+        override short volume()
+        {
+            return m_volume;
+        }
+
+        override short volume(short value)
+        {
+            return m_volume = value;
+        }
+
+        override short volume(double arousal)
+        {
+            return m_volume = cast(short)(128 * arousal);
+        }
+
+        override Scale scale()
         {
             return m_scale;
         }
 
-        Scale scale(Scale value)
+        override Scale scale(Scale value)
         {
             return m_scale = value;
         }
 
-        Scale scale(double arousal)
+        override Scale scale(double arousal)
         {
             if (arousal >= 0 && arousal < 1 / 3)
                 m_scale = Scale.FLAT;
@@ -49,42 +90,4 @@ abstract class Synth: ISynth
             return m_scale;
         }
     }
-
-    @property
-    {
-        uint tempo()
-        {
-            return m_tempo;
-        }
-
-        uint tempo(uint value)
-        {
-            return m_tempo = value;
-        }
-
-        uint tempo(double valence)
-        {
-            return m_tempo = m_durationScale * cast(uint)(1 - valence);
-        }
-    }
-
-    @property
-    {
-        uint volume()
-        {
-            return m_volume;
-        }
-
-        uint volume(uint value)
-        {
-            return m_tempo = value;
-        }
-
-        uint volume(double arousal)
-        {
-            return m_tempo = 128 * cast(uint)arousal;
-        }
-    }
-
-    void play(double[] freqs, uint channel, bool parallel = false);
 }
