@@ -60,11 +60,12 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
     {
         import std.algorithm : clamp;
         auto result = reader.read(chunkSize);
-        immutable averageAmplitude = result.save.map!(a => a / result.length).sum();
-        immutable maxAmplitude = result.save.reduce!max;
-        immutable lpcc = lpccReducer(result.save);
-        immutable predicted = regressor.predict(lpcc);
-        synth.volume = (averageAmplitude / maxAmplitude).clamp(0, 1);
+        auto normalizedAmplitudes = result.save.map!(a => cast(double)(a / result.length));
+        auto averageAmplitude = normalizedAmplitudes.sum();
+        auto maxAmplitude = result.length * normalizedAmplitudes.reduce!max();
+        auto lpcc = lpccReducer(result.save);
+        auto predicted = regressor.predict(lpcc);
+        synth.volume = averageAmplitude / maxAmplitude;
         synth.tempo = predicted.tempo;
         synth.scale = predicted.scale;
         synth.play(generatePinkNoise(roundDownToNearestPowerOfTwo(noiseChunkSize)), settings.channel);
