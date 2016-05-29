@@ -4,22 +4,25 @@ import serendipity.synth.iface;
 
 class Synth
 {
-    private
+    @nogc @safe
     {
-        uint m_durationScale, m_offset, m_spacing, m_tempo, m_volume;
-        Scale m_scale;
-    }
+        private
+        {
+            uint m_durationScale, m_offset, m_spacing, m_tempo, m_volume;
+            Scale m_scale;
+        }
 
-    protected void sendNote(int channel, short key, short velocity, uint duration, uint date);
+        protected void sendNote(int channel, short key, short velocity, uint duration, uint date);
 
-    this(uint durationScale = 10, uint offset = 0, uint spacing = 0, uint tempo = 1, uint volume = 1, Scale scale = Scale.NATURAL)
-    {
-        m_durationScale = durationScale;
-        m_offset = offset;
-        m_spacing = spacing;
-        m_tempo = tempo;
-        m_volume = volume;
-        m_scale = scale;
+        this(uint durationScale = 10, uint offset = 0, uint spacing = 0, uint tempo = 1, uint volume = 1, Scale scale = Scale.NATURAL)
+        {
+            m_durationScale = durationScale;
+            m_offset = offset;
+            m_spacing = spacing;
+            m_tempo = tempo;
+            m_volume = volume;
+            m_scale = scale;
+        }
     }
 
     @property

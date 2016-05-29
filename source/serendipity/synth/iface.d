@@ -9,7 +9,7 @@ enum Scale
 
 class ISynth
 {
-    protected void sendNote(int channel, short key, short velocity, uint duration, uint date);
+    @nogc @safe protected void sendNote(int channel, short key, short velocity, uint duration, uint date);
 
     @property
     {
