@@ -36,4 +36,8 @@ struct SerendipitySettings
     @Argument("source")
     @Help("The source file or ALSA device to read from.")
     string source;
+
+    @Argument("regressor")
+    @Help("The regressor file to read from.")
+    string regressor;
 }

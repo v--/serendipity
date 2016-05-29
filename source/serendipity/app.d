@@ -7,6 +7,7 @@ import std.conv : to;
 import serendipity.constants;
 import serendipity.logger;
 import serendipity.settings;
+import serendipity.regressor;
 import serendipity.reader.factory;
 import serendipity.support.alsa;
 import serendipity.reader.result;
@@ -41,6 +42,7 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
     import std.algorithm : fold;
     auto reader = constructReader(settings, logger);
     auto writer = ALSADevice("pulse", true, 32, 16_000);
+    auto regressor = Regressor(settings.regressor);
 
     while (reader.readable)
     {
@@ -48,5 +50,7 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
         auto normalAmplitudes = result.payload.map!(a => a / result.length);
         auto averageAmplitude = normalAmplitudes.sum!();
         auto lpcc = lpccReducer(result.save);
+        auto predicted = regressor.predict(lpcc);
+        import std.stdio: writeln; writeln(predicted);
     }
 }
