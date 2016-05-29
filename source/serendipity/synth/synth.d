@@ -65,7 +65,7 @@ abstract class Synth: ISynth
 
         override short volume(double arousal)
         {
-            return m_volume = cast(short)(128 * arousal);
+            return m_volume = cast(short)(127 * arousal);
         }
 
         override Scale scale()

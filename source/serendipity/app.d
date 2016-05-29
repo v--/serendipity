@@ -49,7 +49,7 @@ private uint roundDownToNearestPowerOfTwo(uint n)
 void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
 {
     import std.stdio;
-    import std.algorithm : fold, map, sum;
+    import std.algorithm : map, max, sum, reduce;
     auto reader = constructReader(settings, logger);
     auto writer = ALSADevice("pulse", true, 32, 16_000);
     auto regressor = Regressor(settings.regressor);
@@ -58,11 +58,13 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
 
     while (reader.readable)
     {
+        import std.algorithm : clamp;
         auto result = reader.read(chunkSize);
-        immutable averageAmplitude = result.map!(a => a / result.length).sum();
+        immutable averageAmplitude = result.save.map!(a => a / result.length).sum();
+        immutable maxAmplitude = result.save.reduce!max;
         immutable lpcc = lpccReducer(result.save);
         immutable predicted = regressor.predict(lpcc);
-        synth.volume = averageAmplitude;
+        synth.volume = (averageAmplitude / maxAmplitude).clamp(0, 1);
         synth.tempo = predicted.tempo;
         synth.scale = predicted.scale;
         synth.play(generatePinkNoise(roundDownToNearestPowerOfTwo(noiseChunkSize)), settings.channel);
