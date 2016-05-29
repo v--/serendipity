@@ -45,7 +45,8 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
     while (reader.readable)
     {
         auto result = reader.read(chunkSize);
-        auto averageAmplitude = result.payload.fold!((a, b) => a + b) / result.length;
+        auto normalAmplitudes = result.payload.map!(a => a / result.length);
+        auto averageAmplitude = normalAmplitudes.sum!();
         auto lpcc = lpccReducer(result.save);
     }
 }
