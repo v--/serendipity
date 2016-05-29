@@ -48,8 +48,8 @@ class FluidSynth: Synth
             fluid_event_t* event = new_fluid_event();
             fluid_event_set_source(event, -1);
             fluid_event_set_dest(event, synthSequencerID);
-            fluid_event_note(event, channel, key, velocity);
-            int fluid_res = fluid_sequencer_send_at(sequencer, event, date, duration);
+            fluid_event_note(event, channel, key, velocity, duration);
+            fluid_sequencer_send_at(sequencer, event, date, 1);
             delete_fluid_event(event);
         }
 
