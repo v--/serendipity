@@ -8,3 +8,5 @@ __test*
 /serendipity
 
 *.png
+
+*.mtx
