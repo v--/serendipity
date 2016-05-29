@@ -46,19 +46,8 @@ class FluidSynth: Synth
             short synthSequencerID, clientSequencerID;
         }
 
-        override protected void sendNote(int channel, short key, short velocity, uint duration, uint date)
+        private void initSynth(const char* soundfont)
         {
-            fluid_event_t* event = new_fluid_event();
-            fluid_event_set_source(event, -1);
-            fluid_event_set_dest(event, synthSequencerID);
-            fluid_event_note(event, channel, key, velocity, duration);
-            fluid_sequencer_send_at(sequencer, event, date, 1);
-            delete_fluid_event(event);
-        }
-
-        this(string soundfont, uint durationScale = 10, uint offset = 0, uint spacing = 0, uint tempo = 1, uint volume = 1, Scale scale = Scale.NATURAL)
-        {
-            super(durationScale, offset, spacing, tempo, volume, scale);
             settings = new_fluid_settings();
             synth = new_fluid_synth(settings);
             adriver = new_fluid_audio_driver(settings, synth);
@@ -73,27 +62,49 @@ class FluidSynth: Synth
             fluid_synth_sfload(synth, soundfont, 1);
         }
 
-        ~this()
+        private void destroySynth()
         {
             delete_fluid_sequencer(sequencer);
             delete_fluid_audio_driver(adriver);
             delete_fluid_synth(synth);
         }
+
+        @nogc @safe protected void sendNote(int channel, short key, short velocity, uint duration, uint date)
+        {
+            fluid_event_t* event = new_fluid_event();
+            fluid_event_set_source(event, -1);
+            fluid_event_set_dest(event, synthSequencerID);
+            fluid_event_note(event, channel, key, velocity, duration);
+            fluid_sequencer_send_at(sequencer, event, date, 1);
+            delete_fluid_event(event);
+        }
     }
 
-    override void play(double[] freqs, uint channel, bool parallel = false)
+    this(string soundfont, uint durationScale = 10, uint offset = 0, uint spacing = 0, uint tempo = 1, short volume = 1, Scale scale = Scale.NATURAL)
+    {
+        import std.string : toStringz;
+        super(durationScale, offset, spacing, tempo, volume, scale);
+        initSynth(soundfont.toStringz());
+    }
+
+    ~this()
+    {
+        destroySynth();
+    }
+
+    void play(double[] freqs, int channel, bool parallel = false)
     {
         import std.algorithm : map;
         auto keys = freqs.map!(a => 64 * (a + 1));
-        uint now = fluid_sequencer_get_tick(sequencer) + offset;
-        uint noteDuration = tempo / freqs.length;
+        uint now = fluid_sequencer_get_tick(sequencer) + offset();
+        uint noteDuration = cast(uint)(tempo / freqs.length);
 
         foreach (key; keys)
         {
-            sendNote(channel, key + scale, velocity, noteDuration, now);
+            sendNote(channel, cast(short)(key + scale()), volume(), noteDuration, now);
 
             if (!parallel)
-                now += noteDuration + spacing;
+                now += noteDuration + spacing();
         }
     }
 }
