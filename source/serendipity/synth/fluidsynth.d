@@ -49,6 +49,7 @@ class FluidSynth: Synth
         private void initSynth(const char* soundfont)
         {
             settings = new_fluid_settings();
+            fluid_settings_setstr(settings, "audio.driver", "alsa");
             synth = new_fluid_synth(settings);
             adriver = new_fluid_audio_driver(settings, synth);
             sequencer = new_fluid_sequencer2(0);
