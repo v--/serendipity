@@ -5,7 +5,7 @@ import std.array;
 ///
 struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0)
 {
-    import std.traits : Unqual;
+    import std.traits : Unqual, isImplicitlyConvertible;
     import std.range : ElementType, isInputRange;
 
     ///
@@ -23,7 +23,7 @@ struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0)
     private T[elementCount] payload;
 
     /// Assigns an input range's values to the matrix
-    this(R)(R range) if (isInputRange!(Unqual!R) && is(ElementType!R == T))
+    this(R)(R range) if (isInputRange!(Unqual!R) && isImplicitlyConvertible!(ElementType!R, T))
     {
         foreach (ref item; payload)
         {

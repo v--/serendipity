@@ -5,6 +5,7 @@ import std.range;
 
 import serendipity.constants;
 import serendipity.reader.result;
+import serendipity.support.matrix;
 import serendipity.reducers.least_squares;
 
 private auto compressReaderResult(ReaderResult data)
@@ -25,7 +26,15 @@ private auto compressReaderResult(ReaderResult data)
 auto lpccReducer(ReaderResult data)
 {
     double[lpccCount] result;
-    immutable compressed = compressReaderResult(data);
-    //foreach (item; compressed)
+    auto compressed = compressReaderResult(data);
+
+    foreach (i, value; compressed)
+    {
+        immutable input = ColVector!(double, lpccCount)(iota(0, lpccCount));
+        immutable output = ColVector!(double, lpccCount)(compressed[].take(i).chain(repeat(0)));
+        immutable prediction = leastSquares!(double, lpccCount, 1)(input, output)[0, 0];
+        result[i] = value - prediction;
+    }
+
     return result;
 }
