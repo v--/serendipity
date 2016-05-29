@@ -39,7 +39,7 @@ int main(string[] args)
 void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
 {
     import std.stdio;
-    import std.algorithm : fold;
+    import std.algorithm : fold, map, sum;
     auto reader = constructReader(settings, logger);
     auto writer = ALSADevice("pulse", true, 32, 16_000);
     auto regressor = Regressor(settings.regressor);
