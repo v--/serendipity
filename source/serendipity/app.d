@@ -12,6 +12,7 @@ import serendipity.reader.factory;
 import serendipity.support.alsa;
 import serendipity.reader.result;
 import serendipity.reducers.lpcc;
+import serendipity.synth.fluidsynth;
 
 int main(string[] args)
 {
