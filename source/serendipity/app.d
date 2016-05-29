@@ -38,6 +38,14 @@ int main(string[] args)
     return 0;
 }
 
+private uint roundDownToNearestPowerOfTwo(uint n)
+{
+    uint power = 1;
+    while (power < n)
+        power *= 2;
+    return power;
+}
+
 void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
 {
     import std.stdio;
@@ -57,7 +65,7 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
         synth.volume = averageAmplitude;
         synth.tempo = predicted.tempo;
         synth.scale = predicted.scale;
-        synth.play(generatePinkNoise(noiseChunkSize), settings.channel);
+        synth.play(generatePinkNoise(roundDownToNearestPowerOfTwo(noiseChunkSize)), settings.channel);
         import std.stdio: writeln; writeln(predicted);
     }
 }
