@@ -37,12 +37,15 @@ int main(string[] args)
 
 void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
 {
+    import std.stdio;
+    import std.algorithm : fold;
     auto reader = constructReader(settings, logger);
     auto writer = ALSADevice("pulse", true, 32, 16_000);
 
-    //while (reader.readable)
+    while (reader.readable)
     {
         auto result = reader.read(chunkSize);
+        auto averageAmplitude = result.payload.fold!((a, b) => a + b) / result.length;
         auto lpcc = lpccReducer(result.save);
     }
 }
