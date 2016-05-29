@@ -2,7 +2,7 @@ module serendipity.synth.synth;
 
 import serendipity.synth.iface;
 
-class Synth
+abstract class Synth: ISynth
 {
     @nogc @safe
     {
