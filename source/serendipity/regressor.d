@@ -61,6 +61,12 @@ struct Regressor
             this.tempo = clamp(tempo, 0, 1);
             this.scale = clamp(scale, 0, 1);
         }
+
+        string toString() @property const
+        {
+            import std.string : format;
+            return "Tempo: %02f, Scale: %02f".format(tempo, scale);
+        }
     }
 
     @disable this();

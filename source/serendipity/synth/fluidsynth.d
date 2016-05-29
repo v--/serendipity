@@ -97,11 +97,12 @@ class FluidSynth: Synth
     void play(double[] freqs, int channel, bool parallel = false)
     {
         import std.algorithm : map;
+        import std.range : take;
         auto keys = freqs.map!(a => 64 * (a + 1));
         uint now = fluid_sequencer_get_tick(sequencer) + offset();
         uint noteDuration = cast(uint)(tempo / freqs.length);
 
-        foreach (key; keys)
+        foreach (key; keys.take(10))
         {
             sendNote(channel, cast(short)(key + scale()), volume(), noteDuration, now);
 
