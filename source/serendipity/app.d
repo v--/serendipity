@@ -3,7 +3,6 @@ module serendipity.app;
 import core.memory : GC;
 import std.typecons : scoped;
 import std.conv : to;
-import subscribed;
 
 import serendipity.logger;
 import serendipity.settings;

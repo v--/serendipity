@@ -4,7 +4,6 @@ copyright "Copyright © 2016, the Serendipity development team"
 authors "Ianis G. Vasilev" "Radoslav Georgiev"
 
 dependency "alsa-lib" version="~>1.0.1+1.0.27.2"
-dependency "subscribed" version="~>1.6.1"
 dependency "colored-logger" version="~>0.1.0"
 dependency "darg" version="~>0.0.4"
 
