@@ -1,5 +1,6 @@
 module serendipity.synth.fluidsynth;
 
+import serendipity.synth.iface : Scale;
 import serendipity.synth.synth;
 
 struct fluid_settings_t;
