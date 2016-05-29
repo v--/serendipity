@@ -3,7 +3,8 @@ module serendipity.support.matrix;
 import std.array;
 
 ///
-struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0) {
+struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0)
+{
     import std.traits : Unqual;
     import std.range : ElementType, isInputRange;
 
@@ -73,7 +74,7 @@ struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0) {
     }
     body
     {
-        payload[i * rows + j] = value;
+        payload[i * cols + j] = value;
     }
 
     auto opUnary(string op: "-")() @safe @nogc const
@@ -82,7 +83,7 @@ struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0) {
     }
 
     ///
-    auto opBinary(string op: "+")(inout ref Matrix!(T, rows, cols) rhl) @safe @nogc const
+    auto opBinary(string op: "+")(inout Matrix!(T, rows, cols) rhl) @safe const
     {
         Matrix!(T, rows, cols) result;
 
@@ -121,14 +122,14 @@ struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0) {
     }
 
     ///
-    auto opBinary(string op: "*", size_t n)(inout ref Matrix!(T, cols, n) rhl) @safe @nogc const
+    auto opBinary(string op: "*", size_t n)(inout Matrix!(T, cols, n) rhl) @safe const
     {
         Matrix!(T, rows, n) result;
 
         foreach (i; 0..rows)
             foreach (j; 0..n)
             {
-                T stuff;
+                T stuff = 0;
 
                 foreach (k; 0..cols)
                     stuff += this[i, k] * rhl[k, j];
@@ -158,10 +159,24 @@ struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0) {
         static assert(c.colCount == 2 && c.rowCount == 2);
         assert(c == [58, 64, 139, 154]);
     }
+
+    //
+    string toString() const
+    {
+        import std.algorithm : map;
+        import std.conv : to;
+        import std.string : join;
+        string[] result;
+
+        foreach (i; 0..rows)
+            result ~= '|' ~ payload[cols * i..cols * (i + 1)].map!(x => to!string(x)).join(", ") ~ '|';
+
+        return result.join("\n");
+    }
 }
 
 ///
-auto minorMatrix(T, size_t rows, size_t cols)(Matrix!(T, rows, cols) matrix, size_t row, size_t col)
+auto minorMatrix(T, size_t rows, size_t cols)(inout Matrix!(T, rows, cols) matrix, size_t row, size_t col)
 {
     Matrix!(T, rows - 1, cols - 1) result;
 
@@ -186,13 +201,13 @@ unittest
 }
 
 ///
-auto transpose(T, size_t rows, size_t cols)(Matrix!(T, rows, cols) matrix)
+auto transpose(T, size_t rows, size_t cols)(inout Matrix!(T, rows, cols) matrix)
 {
-    Matrix!(T, rows, cols) result;
+    Matrix!(T, cols, rows) result;
 
     foreach (i; 0..rows)
         foreach (j; 0..cols)
-            result[i, j] = matrix[j, i];
+            result.payload[j * rows + i] = matrix[i, j];
 
     return result;
 }
@@ -204,8 +219,15 @@ unittest
     assert(transpose(matrix) == [0, 3, 6, 1, 4, 7, 2, 5, 8]);
 }
 
+unittest
+{
+    import std.range : iota;
+    auto matrix = Matrix!(int, 2, 3)(iota(0, 6));
+    assert(transpose(matrix) == [0, 3, 1, 4, 2, 5]);
+}
+
 ///
-auto determinant(T, size_t size)(Matrix!(T, size, size) matrix)
+auto determinant(T, size_t size)(inout Matrix!(T, size, size) matrix)
 {
     T result = 0;
 
@@ -216,7 +238,7 @@ auto determinant(T, size_t size)(Matrix!(T, size, size) matrix)
 }
 
 ///
-auto determinant(T, size_t size: 1)(Matrix!(T, size, size) matrix)
+auto determinant(T, size_t size: 1)(inout Matrix!(T, size, size) matrix)
 {
     return matrix.payload[0];
 }
@@ -253,11 +275,10 @@ unittest
 }
 
 ///
-auto inverse(T, size_t size)(Matrix!(T, size, size) matrix)
+auto inverse(T, size_t size)(inout Matrix!(T, size, size) matrix)
 {
     immutable det = determinant(matrix);
-    import std.stdio: writeln; writeln(determinant(minorMatrix(matrix, 0, 0)));
-    assert(det != 0, "Cannot invert a null matrix");
+    assert(det != 0, "Cannot invert a singular matrix.");
     Matrix!(T, size, size) result;
 
     foreach (i; 0..size)
@@ -268,6 +289,19 @@ auto inverse(T, size_t size)(Matrix!(T, size, size) matrix)
         }
 
     return result;
+}
+
+///
+auto inverse(T, size_t size: 1)(inout Matrix!(T, size, size) matrix)
+{
+    immutable det = determinant(matrix);
+    assert(det != 0, "Cannot invert a singular matrix.");
+    return Matrix!(T, size, size)([1 / matrix[0, 0]]);
+}
+
+unittest
+{
+    assert(inverse(Matrix!(double, 1, 1)([4.0])) == [0.25]);
 }
 
 unittest
