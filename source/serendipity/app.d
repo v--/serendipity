@@ -13,6 +13,7 @@ import serendipity.support.alsa;
 import serendipity.reader.result;
 import serendipity.reducers.lpcc;
 import serendipity.synth.fluidsynth;
+import serendipity.synth.noise : generatePinkNoise;
 
 int main(string[] args)
 {
@@ -56,7 +57,7 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
         synth.volume = averageAmplitude;
         synth.tempo = predicted.tempo;
         synth.scale = predicted.scale;
-        synth.play(noiseChunkSize, settings.channel);
+        synth.play(generatePinkNoise(noiseChunkSize), settings.channel);
         import std.stdio: writeln; writeln(predicted);
     }
 }
