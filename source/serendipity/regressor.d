@@ -56,12 +56,6 @@ struct Regressor
         double tempo;
         double scale;
 
-        this(double tempo, double scale)
-        {
-            this.tempo = clamp(tempo, 0, 1);
-            this.scale = clamp(scale, 0, 1);
-        }
-
         string toString() @property const
         {
             import std.string : format;
@@ -115,8 +109,8 @@ struct Regressor
                     trainingSet[i, k] = item;
 
                 auto expectedEmotion = parseBerlinFileName(entry.name.baseName());
-                resultSetTempo[i, 0] = expectedEmotion.tempo * ushort.max * 10;
-                resultSetScale[i, 0] = expectedEmotion.scale * ushort.max * 10;
+                resultSetTempo[i, 0] = expectedEmotion.tempo;
+                resultSetScale[i, 0] = expectedEmotion.scale;
                 i++;
             }
 

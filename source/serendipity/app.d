@@ -65,10 +65,10 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
         auto maxAmplitude = result.length * normalizedAmplitudes.reduce!max();
         auto lpcc = lpccReducer(result.save);
         auto predicted = regressor.predict(lpcc);
-        synth.volume = averageAmplitude / maxAmplitude;
-        synth.tempo = predicted.tempo;
-        synth.scale = predicted.scale;
-        synth.play(generatePinkNoise(roundDownToNearestPowerOfTwo(noiseChunkSize)), settings.channel);
+        //synth.volume = averageAmplitude / maxAmplitude;
+        //synth.tempo = predicted.tempo;
+        //synth.scale = predicted.scale;
+        //synth.play(generatePinkNoise(roundDownToNearestPowerOfTwo(noiseChunkSize)), settings.channel);
         import std.stdio: writeln; writeln(predicted);
     }
 }
