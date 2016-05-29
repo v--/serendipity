@@ -9,22 +9,25 @@ struct fluid_audio_driver_t;
 struct fluid_sequencer_t;
 struct fluid_event_t;
 
-extern (C) fluid_settings_t* new_fluid_settings();
-extern (C) fluid_synth_t* new_fluid_synth(fluid_settings_t* settings);
-extern (C) fluid_audio_driver_t* new_fluid_audio_driver(fluid_settings_t* settings, fluid_synth_t* synth);
-extern (C) fluid_sequencer_t* new_fluid_sequencer2(int use_system_timer);
-extern (C) short fluid_sequencer_register_fluidsynth(fluid_sequencer_t* seq, fluid_synth_t* synth);
-extern (C) int fluid_synth_sfload(fluid_synth_t* synth, const char* filename, int reset_presets);
-extern (C) uint fluid_sequencer_get_tick(fluid_sequencer_t* seq);
-extern (C) fluid_event_t* new_fluid_event();
-extern (C) void fluid_event_set_source(fluid_event_t* event, short src);
-extern (C) void fluid_event_set_dest(fluid_event_t* event, short dest);
-extern (C) void fluid_event_noteon(fluid_event_t* event, int channel, short key, short velocity);
-extern (C) int fluid_sequencer_send_at(fluid_sequencer_t* seq, fluid_event_t* event, uint time, int absolute);
-extern (C) void delete_fluid_event(fluid_event_t* event);
-extern (C) void delete_fluid_sequencer(fluid_sequencer_t* seq);
-extern (C) void delete_fluid_audio_driver(fluid_audio_driver_t* driver);
-extern (C) int delete_fluid_synth(fluid_synth_t* synth);
+@nogc @safe
+{
+    extern (C) fluid_settings_t* new_fluid_settings();
+    extern (C) fluid_synth_t* new_fluid_synth(fluid_settings_t* settings);
+    extern (C) fluid_audio_driver_t* new_fluid_audio_driver(fluid_settings_t* settings, fluid_synth_t* synth);
+    extern (C) fluid_sequencer_t* new_fluid_sequencer2(int use_system_timer);
+    extern (C) short fluid_sequencer_register_fluidsynth(fluid_sequencer_t* seq, fluid_synth_t* synth);
+    extern (C) int fluid_synth_sfload(fluid_synth_t* synth, const char* filename, int reset_presets);
+    extern (C) uint fluid_sequencer_get_tick(fluid_sequencer_t* seq);
+    extern (C) fluid_event_t* new_fluid_event();
+    extern (C) void fluid_event_set_source(fluid_event_t* event, short src);
+    extern (C) void fluid_event_set_dest(fluid_event_t* event, short dest);
+    extern (C) void fluid_event_noteon(fluid_event_t* event, int channel, short key, short velocity);
+    extern (C) int fluid_sequencer_send_at(fluid_sequencer_t* seq, fluid_event_t* event, uint time, int absolute);
+    extern (C) void delete_fluid_event(fluid_event_t* event);
+    extern (C) void delete_fluid_sequencer(fluid_sequencer_t* seq);
+    extern (C) void delete_fluid_audio_driver(fluid_audio_driver_t* driver);
+    extern (C) int delete_fluid_synth(fluid_synth_t* synth);
+}
 
 class FluidSynth: Synth
 {
