@@ -13,24 +13,22 @@ class ISynth
 
     @property
     {
+        uint durationScale();
+        uint offset();
+        uint spacing();
+
+        uint tempo();
+        uint tempo(uint value);
+        uint tempo(double valence);
+
+        short volume();
+        short volume(short value);
+        short volume(double arousal);
+
         Scale scale();
         Scale scale(Scale value);
         Scale scale(double arousal);
     }
 
-    @property
-    {
-        uint tempo();
-        uint tempo(uint value);
-        uint tempo(double valence);
-    }
-
-    @property
-    {
-        uint volume();
-        uint volume(uint value);
-        uint volume(double arousal);
-    }
-
-    void play(double[] freqs, uint channel, bool parallel = false);
+    void play(double[] freqs, int channel, bool parallel = false);
 }
