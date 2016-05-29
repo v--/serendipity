@@ -6,13 +6,13 @@ import std.range;
 
 struct WAVFile(R) if (isInputRange!(Unqual!R) && is(ElementType!R == ubyte))
 {
-    const
-    {
+    //const
+    //{
         ubyte bitDepth;
         uint sampleRate;
         size_t size;
         R data;
-    }
+    //}
 
     this(R data)
     {

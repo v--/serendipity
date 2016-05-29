@@ -20,7 +20,7 @@ struct Matrix(T, size_t rows, size_t cols) if (rows > 0 && cols > 0)
     ///
     enum isSquare = cols == rows;
 
-    private T[elementCount] payload;
+    T[elementCount] payload;
 
     /// Assigns an input range's values to the matrix
     this(R)(R range) if (isInputRange!(Unqual!R) && isImplicitlyConvertible!(ElementType!R, T))

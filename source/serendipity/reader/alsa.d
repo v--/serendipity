@@ -12,17 +12,7 @@ import serendipity.support.alsa;
 
 class ALSAReader: IReader
 {
-    private
-    {
-        ALSADevice device;
-
-        static int enforceALSA(int value, lazy string message)
-        {
-            import std.string : format, fromStringz;
-            //assert(value >= 0, "ALSA PCM Error: %s. %s.".format(message(), fromStringz(snd_strerror(value))));
-            return value;
-        }
-    }
+    private ALSADevice device;
 
     this(SerendipitySettings* settings, SerendipityLogger logger)
     {
