@@ -26,7 +26,7 @@ class WAVReader: IReader
         {
             bool readable()
             {
-                return pos < file.size;
+                return pos * file.bitDepth / 8 < file.size;
             }
 
             ubyte depth()
