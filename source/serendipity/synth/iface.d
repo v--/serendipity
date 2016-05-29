@@ -7,7 +7,7 @@ enum Scale
     FLAT = -1
 }
 
-class ISynth
+interface ISynth
 {
     @nogc @safe protected void sendNote(int channel, short key, short velocity, uint duration, uint date);
 
