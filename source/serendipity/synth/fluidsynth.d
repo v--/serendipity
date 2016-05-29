@@ -9,6 +9,8 @@ struct fluid_audio_driver_t;
 struct fluid_sequencer_t;
 struct fluid_event_t;
 
+alias fluid_event_callback_t = void function(uint time, fluid_event_t* event, fluid_sequencer_t* seq, void* data);
+
 @nogc @safe
 {
     extern (C) fluid_settings_t* new_fluid_settings();
@@ -65,7 +67,7 @@ class FluidSynth: Synth
             synthSequencerID = fluid_sequencer_register_fluidsynth(sequencer, synth);
 
             // register client as second destination
-            clientSequencerID = fluid_sequencer_register_client(sequencer, "me", NULL, NULL);
+            clientSequencerID = fluid_sequencer_register_client(sequencer, "me", null, null);
 
             fluid_synth_sfload(synth, soundfont, 1);
         }
