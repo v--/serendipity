@@ -40,4 +40,16 @@ struct SerendipitySettings
     @Argument("regressor")
     @Help("The regressor file to read from.")
     string regressor;
+
+    @Argument("soundfont", "f")
+    @Help("The SoundFont file for FluidSynth.")
+    string soundfont;
+
+    @Argument("entropy-rate", "r")
+    @Help("The quotient which determines the sample size for the pink noise melody template (pink noise sample size = entropy rate * input chunk size). Default is 1.")
+    string entropyRate = 1;
+
+    @Argument("channel", "c")
+    @Help("The MIDI channel on which the melody will be played. Defaults to 0.")
+    string channel = 0;
 }
