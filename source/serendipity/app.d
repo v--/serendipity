@@ -47,10 +47,9 @@ void startEventLoop(SerendipitySettings* settings, SerendipityLogger logger)
     while (reader.readable)
     {
         auto result = reader.read(chunkSize);
-        auto normalAmplitudes = result.payload.map!(a => a / result.length);
-        auto averageAmplitude = normalAmplitudes.sum!();
-        auto lpcc = lpccReducer(result.save);
-        auto predicted = regressor.predict(lpcc);
+        immutable averageAmplitude = result.map!(a => a / result.length).sum();
+        immutable lpcc = lpccReducer(result.save);
+        immutable predicted = regressor.predict(lpcc);
         import std.stdio: writeln; writeln(predicted);
     }
 }
